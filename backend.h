@@ -25,26 +25,52 @@ enum Days {
 typedef unsigned UserID;
 struct User;
 
+typedef unsigned DestID;
+struct Destination;
+
 typedef unsigned DriveID;
 struct Drive;
 
-struct ReservationID{
+struct ReservationID {
     DriveID driveid;
     std::tm date;
+};
+
+struct Departure {
+    unsigned hours;
+    unsigned minutes;
 };
 
 struct Reservation;
 struct Database;
 
 /* ************************************************************************** */
-/* Functions                                                                  */
+/* Database functions                                                         */
 /* ************************************************************************** */
 
 Database * newDatabase();
 void freeDatabase(Database *db);
 
-Reservation * reserveTicket(Database *db, DriveID driveid, const std::tm * const time, UserID userid);
-void printDrives(const Database *db, const char* destination, FILE *stream = stdout);
+void addDrive(Database *db,
+              unsigned capacity,
+              enum Days repeatdays,
+              std::vector<Departure> *departures,
+              DestID destid);
+
+void addDestination(Database *db, const char *name, double distance);
+
+void addUser(Database *db, const char* name, const char* email);
+
+Reservation * reserveTicket(Database *db,
+                            DriveID driveid,
+                            const std::tm * const time,
+                            UserID userid);
+
+const Drive *getDrive(Database *db, DriveID driveid);
+
+void printDrives(const Database *db, const char* destination, Departure departure,
+                 FILE *stream = stdout);
+
 void printReservations(const Database *db, UserID id);
 
 

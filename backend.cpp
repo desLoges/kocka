@@ -11,14 +11,15 @@ struct User {
     std::string email;
 };
 
+struct Destination {
+    DestID id;
+    std::string name;
+    double distance;
+};
+
 struct Drive {
 
     DriveID id;
-
-    struct Departure {
-        unsigned hours;
-        unsigned minutes;
-    };
 
     unsigned max_capacity;
 
@@ -26,7 +27,7 @@ struct Drive {
 
     std::vector<Departure> departures;
 
-    std::string destination;
+    DestID destination;
 
 };
 
@@ -44,6 +45,13 @@ struct Database {
     std::map<ReservationID, Reservation> reservations;
 
     std::map<UserID, User> users;
+
+    std::map<DestID, Destination> destinations;
+
+    DriveID driveidpool;
+    UserID useridpool;
+    DestID destidpool;
+
 };
 
 /* ************************************************************************** */
@@ -51,9 +59,40 @@ struct Database {
 /* ************************************************************************** */
 
 Database *newDatabase() {
-    return new Database();
+    static Database *db = nullptr;
+
+    if(!db) {
+        // DB init
+        db = new Database();
+        db->driveidpool = 0;
+        db->destidpool = 0;
+        db->useridpool = 0;
+    }
+
+    return db;
 }
 
 void freeDatabase(Database *db) {
     delete db;
+}
+
+void addDrive(Database *db, unsigned capacity, Days repeatdays, std::vector<Departure> *departures, DestID destid) {
+    Drive drive;
+
+    drive.id = db->driveidpool;
+    drive.departures = *departures;
+    drive.max_capacity = capacity;
+    drive.repeat_days = repeatdays;
+    drive.destination = destid;
+
+    db->drives[db->driveidpool] = drive;
+
+    db->driveidpool++;
+}
+
+const Drive *getDrive(Database *db, DriveID driveid) {
+    std::map<DriveID, Drive>::iterator it = db->drives.find(driveid);
+    if(it == db->drives.end()) return nullptr;
+
+    return &(it->second);
 }
