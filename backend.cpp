@@ -51,9 +51,9 @@ struct Database {
 /* ************************************************************************** */
 
 Database *newDatabase() {
-    return
+    return new Database();
 }
 
 void freeDatabase(Database *db) {
-
+    delete db;
 }
