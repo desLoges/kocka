@@ -6,5 +6,5 @@ int main(const int argc, const char *argv[]) {
 
     Database db;
 
-    return EXIT_SUCCESS;
+    return 0;
 }

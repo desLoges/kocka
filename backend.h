@@ -67,7 +67,7 @@ public:
 
     const DriveStoreSubset getDrives() {
         DriveStoreSubset subset;
-        subset.from = drives_.start();
+        //subset.from = drives_.start();
         subset.to = drives_.end();
         return subset;
     }
