@@ -3,78 +3,49 @@
 
 #include <map>
 #include <list>
+#include <vector>
 #include <string>
 #include <ctime>
+#include <cstdio>
 
+/* ************************************************************************** */
+/* Data structures                                                            */
+/* ************************************************************************** */
 
-typedef std::time_t Date;
-
-struct Drive {
-
-    typedef unsigned ID;
-
-private:
-
-    Date departure_;
-
-public:
-
-    unsigned getCapacity() const;
-
-    const Date& getDeparture() const;
-
+enum Days {
+    MONDAY = 0b01,
+    TUESDAY = 0b10,
+    WEDNESDAY = 0b100,
+    THURSDAY = 0b1000,
+    FRIDAY = 0b10000,
+    SATURDAY = 0b100000,
+    SUNDAY = 0b1000000
 };
 
-struct Reservation {
+typedef unsigned UserID;
+struct User;
 
-    typedef unsigned ID;
+typedef unsigned DriveID;
+struct Drive;
 
+struct ReservationID{
+    DriveID driveid;
+    std::tm date;
 };
 
+struct Reservation;
+struct Database;
 
-struct Database {
+/* ************************************************************************** */
+/* Functions                                                                  */
+/* ************************************************************************** */
 
-    typedef std::list< Drive> DriveStore;
+Database * newDatabase();
+void freeDatabase(Database *db);
 
-    struct DriveStoreSubset{
-        DriveStore::const_iterator from;
-        DriveStore::const_iterator to;
-    };
-
-    typedef std::map<Reservation::ID, Reservation> ReservationStore;
-private:
-
-    DriveStore drives_;
-    ReservationStore reservations_;
-
-public:
-
-    bool reserveTicket(Drive::ID driveid, const std::string& name);
-
-    const DriveStoreSubset getDrives(const Date& from, const Date& to) {
-
-        DriveStoreSubset subset;
-        subset.from = drives_.end();
-        subset.to = drives_.end();
-
-        for(DriveStore::const_iterator it = drives_.begin(); it != drives_.end(); it++) {
-            if(subset.from == drives_.end() && it->getDeparture() >= from) subset.from = it;
-            if(it->getDeparture() <= to) subset.from = it;
-        }
-
-        return subset;
-    }
-
-    const DriveStoreSubset getDrives() {
-        DriveStoreSubset subset;
-        //subset.from = drives_.start();
-        subset.to = drives_.end();
-        return subset;
-    }
-
-
-};
-
+Reservation * reserveTicket(Database *db, DriveID driveid, const std::tm * const time, UserID userid);
+void printDrives(const Database *db, const char* destination, FILE *stream = stdout);
+void printReservations(const Database *db, UserID id);
 
 
 #endif // BACKEND_H
